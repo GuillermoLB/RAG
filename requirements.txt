@@ -1,0 +1,6 @@
+black
+fastapi
+uvicorn
+flake8
+pytest
+# Add other dependencies as needed
