@@ -3,4 +3,5 @@ fastapi
 uvicorn
 flake8
 pytest
+python-dotenv
 # Add other dependencies as needed
