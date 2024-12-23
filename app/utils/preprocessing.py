@@ -16,19 +16,46 @@ embed_model_id = os.getenv('EMBED_MODEL_ID')
 max_tokens = int(os.getenv('MAX_TOKENS', 512))  # Ensure max_tokens is an integer
 
 def convert_document(input_path: Path):
-    """Convert the document using DocumentConverter."""
+    """
+    Convert the document using DocumentConverter.
+
+    Args:
+        input_path (Path): The path to the input document.
+
+    Returns:
+        Document: The converted document.
+    """
     logger.info(f"Converting document: {input_path}")
     converter = DocumentConverter()
     result = converter.convert(input_path)
     return result.document
 
 def initialize_tokenizer(model_id: str):
-    """Initialize the tokenizer."""
+    """
+    Initialize the tokenizer.
+
+    Args:
+        model_id (str): The model ID for the tokenizer.
+
+    Returns:
+        AutoTokenizer: The initialized tokenizer.
+    """
     logger.info(f"Initializing tokenizer with model ID: {model_id}")
     return AutoTokenizer.from_pretrained(model_id)
 
 def chunk_document(doc, tokenizer, max_tokens: int):
-    """Chunk the document using HybridChunker."""
+    """
+    Chunk the document using HybridChunker.
+
+    Args:
+        doc (Document): The document to be chunked.
+        tokenizer (AutoTokenizer): The tokenizer to use for chunking.
+        max_tokens (int): The maximum number of tokens per chunk.
+
+    Returns:
+        list: A list of chunks.
+        HybridChunker: The chunker used for chunking.
+    """
     logger.info("Chunking document")
     chunker = HybridChunker(
         tokenizer=tokenizer,
@@ -38,7 +65,17 @@ def chunk_document(doc, tokenizer, max_tokens: int):
     return list(chunk_iter), chunker
 
 def serialize_chunks(chunks, tokenizer, chunker):
-    """Serialize chunks and return a list of chunk information."""
+    """
+    Serialize chunks and return a list of chunk information.
+
+    Args:
+        chunks (list): The list of chunks to serialize.
+        tokenizer (AutoTokenizer): The tokenizer to use for serialization.
+        chunker (HybridChunker): The chunker used for chunking.
+
+    Returns:
+        list: A list of dictionaries containing chunk information.
+    """
     logger.info("Serializing chunks")
     chunk_data = []
     for i, chunk in enumerate(chunks):
@@ -58,13 +95,22 @@ def serialize_chunks(chunks, tokenizer, chunker):
     return chunk_data
 
 def preprocess_text(data_files_path: str):
+    """
+    Preprocess text by converting and chunking documents.
+
+    Args:
+        data_files_path (str): The path to the directory containing the data files.
+
+    Returns:
+        list: A list of dictionaries containing chunk information.
+    """
     data_files_path = Path(data_files_path)  # Convert to Path object
     logger.info(f"Data files path: {data_files_path}")
     
     # Check if the directory exists
     if not data_files_path.exists():
         logger.error(f"Directory does not exist: {data_files_path}")
-        return
+        return []
     
     # Initialize the tokenizer
     tokenizer = initialize_tokenizer(embed_model_id)
@@ -98,6 +144,8 @@ def preprocess_text(data_files_path: str):
             first_chunk = chunks[0]
             logger.info(f"First chunk attributes: {first_chunk.__dict__}")
             print(f"First chunk attributes: {first_chunk.__dict__}")
+
+    return all_chunk_data
 
 if __name__ == "__main__":
     preprocess_text(data_files_path)

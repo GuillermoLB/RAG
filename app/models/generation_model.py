@@ -1,7 +1,7 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-tokenizer = AutoTokenizer.from_pretrained("gpt-neo-125M")
-model = AutoModelForCausalLM.from_pretrained("gpt-neo-125M")
+tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
+model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M")
 
 def generate_response(query: str, context: str):
     input_text = f"Context: {context}\nQuery: {query}"
