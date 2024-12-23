@@ -4,4 +4,11 @@ uvicorn
 flake8
 pytest
 python-dotenv
-# Add other dependencies as needed
+pgvector
+psycopg2-binary
+python-multipart
+docling
+loguru
+transformers
+sentence-transformers
+tqdm

@@ -6,7 +6,21 @@ services:
     restart: always
     environment:
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: pasword
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: db
     ports:
       - "5432:5432"
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATA_FILES_PATH: /data
+      EMBED_MODEL_ID: EleutherAI/gpt-neo-125M
+      MAX_TOKENS: 512
+    volumes:
+      - .:/app
+      - /data:/data
