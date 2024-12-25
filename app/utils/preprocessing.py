@@ -13,6 +13,7 @@ from tqdm import tqdm
 from docling.chunking import HybridChunker
 from transformers import AutoTokenizer
 from app.database.relational_db import store_document, get_db, get_stored_documents
+from app.models.embedding_model import get_embeddings
 
 # Load the .env file
 load_dotenv()
@@ -89,6 +90,7 @@ def serialize_chunks(chunks, tokenizer, chunker):
         txt_tokens = len(tokenizer.tokenize(chunk.text, max_length=None))
         ser_txt = chunker.serialize(chunk=chunk)
         ser_tokens = len(tokenizer.tokenize(ser_txt, max_length=None))
+        embedding = get_embeddings(chunk.text)
 
         chunk_info = {
             "index": i,
@@ -96,6 +98,7 @@ def serialize_chunks(chunks, tokenizer, chunker):
             "chunk_text_tokens": txt_tokens,
             "serialized_text": ser_txt,
             "serialized_text_tokens": ser_tokens,
+            "embedding": embedding,
         }
         chunk_data.append(chunk_info)
     logger.info(f"Serialized {len(chunks)} chunks")

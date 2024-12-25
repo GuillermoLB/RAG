@@ -40,15 +40,16 @@ def store_document(db: Session, title: str, chunks: list):
     # Store the chunks
     for chunk in chunks:
         chunk_content = chunk['chunk_text']
-        db_chunk = Chunk(document_id=db_document.id, content=chunk_content)
+        chunk_embedding = chunk['embedding']
+        db_chunk = Chunk(document_id=db_document.id, content=chunk_content, embedding=chunk_embedding)
         db.add(db_chunk)
     
     db.commit()
     return db_document
 
-def store_chunk(db: Session, document_id: int, content: str):
+def store_chunk(db: Session, document_id: int, content: str, embedding):
     # Store the chunk
-    db_chunk = Chunk(document_id=document_id, content=content)
+    db_chunk = Chunk(document_id=document_id, content=content, embedding=embedding)
     db.add(db_chunk)
     db.commit()
     return db_chunk
@@ -70,7 +71,7 @@ def get_stored_documents():
     for document in documents:
         print(f"Document ID: {document.id}, Title: {document.title}")
         for chunk in document.chunks:
-            print(f"  Chunk ID: {chunk.id}, Content: {chunk.content}")
+            print(f"  Chunk ID: {chunk.id}, Content: {chunk.content}, Embedding: {chunk.embedding}")
 
 if __name__ == "__main__":
     drop_db()

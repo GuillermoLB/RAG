@@ -17,4 +17,5 @@ class Chunk(Base):
     id = Column(Integer, primary_key=True, index=True)
     document_id = Column(Integer, ForeignKey('documents.id'), nullable=False)
     content = Column(Text, nullable=False)
+    embedding = Column(Vector(384))  # Add the embedding attribute with appropriate dimension
     document = relationship("Document", back_populates="chunks")
