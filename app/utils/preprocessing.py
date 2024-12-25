@@ -1,17 +1,24 @@
-from dotenv import load_dotenv
+import sys
 import os
+import argparse
+
+# Add the root directory to sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from dotenv import load_dotenv
 from pathlib import Path
 from docling.document_converter import DocumentConverter
 from loguru import logger
 from tqdm import tqdm
 from docling.chunking import HybridChunker
 from transformers import AutoTokenizer
+from app.database.relational_db import store_document, get_db, get_stored_documents
 
 # Load the .env file
 load_dotenv()
 
 # Access environment variables
-data_files_path = os.getenv('DATA_FILES_PATH')
+data_files_path = os.getenv('DATA_FILES_PATH', 'data')  # Default to 'data' if not set
 embed_model_id = os.getenv('EMBED_MODEL_ID')
 max_tokens = int(os.getenv('MAX_TOKENS', 512))  # Ensure max_tokens is an integer
 
@@ -132,20 +139,25 @@ def preprocess_text(data_files_path: str):
 
         # Serialize chunks
         chunk_data = serialize_chunks(chunks, tokenizer, chunker)
-
+    
         all_chunk_data.extend(chunk_data)
+        
+        # Store the document and its chunks
+        db = next(get_db())
+        store_document(db, input_path.name, chunk_data)
         
         # Log the processed document
         logger.info(f"Processed document: {doc}")
         print(f"Processed document: {doc}")
 
-        # Log and print the attributes of the first chunk for testing
-        if chunks:
-            first_chunk = chunks[0]
-            logger.info(f"First chunk attributes: {first_chunk.__dict__}")
-            print(f"First chunk attributes: {first_chunk.__dict__}")
-
     return all_chunk_data
 
 if __name__ == "__main__":
-    preprocess_text(data_files_path)
+    parser = argparse.ArgumentParser(description="Preprocess text or retrieve stored documents.")
+    parser.add_argument("command", choices=["preprocess", "retrieve"], help="Command to execute")
+    args = parser.parse_args()
+
+    if args.command == "preprocess":
+        preprocess_text(data_files_path)
+    elif args.command == "retrieve":
+        get_stored_documents()

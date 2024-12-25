@@ -12,3 +12,4 @@ loguru
 transformers
 sentence-transformers
 tqdm
+sqlalchemy
