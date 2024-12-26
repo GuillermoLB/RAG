@@ -3,7 +3,7 @@ from app.services.document_service import ingest_document
 
 router = APIRouter()
 
-@router.get("/ingest")
+@router.post("/ingest")
 async def ingest_document():
     try:
         # Ingest the document

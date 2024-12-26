@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from dotenv import load_dotenv
@@ -40,19 +41,46 @@ def store_document(db: Session, title: str, chunks: list):
     # Store the chunks
     for chunk in chunks:
         chunk_content = chunk['chunk_text']
+        chunk_serialized_text = chunk['serialized_text']
         chunk_embedding = chunk['embedding']
-        db_chunk = Chunk(document_id=db_document.id, content=chunk_content, embedding=chunk_embedding)
+        db_chunk = Chunk(document_id=db_document.id, content=chunk_content, serialized_text=chunk_serialized_text, embedding=chunk_embedding)
         db.add(db_chunk)
     
     db.commit()
     return db_document
 
-def store_chunk(db: Session, document_id: int, content: str, embedding):
+def store_chunk(db: Session, document_id: int, content: str, serialized_text: str, embedding):
     # Store the chunk
-    db_chunk = Chunk(document_id=document_id, content=content, embedding=embedding)
+    db_chunk = Chunk(document_id=document_id, content=content, serialized_text=serialized_text, embedding=embedding)
     db.add(db_chunk)
     db.commit()
     return db_chunk
+
+def search_vectors(query_embedding: np.ndarray, top_k: int = 5) -> list:
+    """
+    Search for the most similar vectors in the database.
+
+    Args:
+        query_embedding (np.ndarray): The query embedding vector.
+        top_k (int): The number of top similar vectors to retrieve.
+
+    Returns:
+        list: A list of the most similar document contents.
+    """
+    db = next(get_db())
+    query_embedding = np.array(query_embedding).reshape(1, -1)
+    
+    # Retrieve all chunks and their embeddings
+    chunks = db.query(Chunk).all()
+    chunk_embeddings = np.array([chunk.embedding for chunk in chunks])
+    
+    # Compute cosine similarity between query embedding and chunk embeddings
+    similarities = np.dot(chunk_embeddings, query_embedding.T).flatten()
+    top_indices = similarities.argsort()[-top_k:][::-1]
+    
+    # Retrieve the most similar document contents
+    top_chunks = [chunks[i].content for i in top_indices]
+    return top_chunks
 
 # Function to drop the database tables
 def drop_db():
@@ -71,7 +99,7 @@ def get_stored_documents():
     for document in documents:
         print(f"Document ID: {document.id}, Title: {document.title}")
         for chunk in document.chunks:
-            print(f"  Chunk ID: {chunk.id}, Content: {chunk.content}, Embedding: {chunk.embedding}")
+            print(f"  Chunk ID: {chunk.id}, Content: {chunk.content}, Serialized Text: {chunk.serialized_text}, Embedding: {chunk.embedding}")
 
 if __name__ == "__main__":
     drop_db()
