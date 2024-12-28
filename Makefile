@@ -37,8 +37,17 @@ format:
 .PHONY: create_environment
 create_environment:
 	python3 -m venv .venv
-    @echo ">>> New virtualenv created. Activate with:\nsource .venv/bin/activate"
+	@echo ">>> New virtualenv created. Activate with:\nsource .venv/bin/activate"
 
+## Initialize the database using Alembic
+.PHONY: init_db
+init_db:
+	docker-compose up db -d  # Start the Docker services
+
+## Run the FastAPI application locally
+.PHONY: run
+run:
+	. .venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 #################################################################################
 # PROJECT RULES                                                                 #

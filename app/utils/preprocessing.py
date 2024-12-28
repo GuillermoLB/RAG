@@ -19,7 +19,7 @@ from app.models.embedding_model import get_embeddings
 load_dotenv()
 
 # Access environment variables
-data_files_path = os.getenv('DATA_FILES_PATH', 'data')  # Default to 'data' if not set
+data_files_path = os.getenv('DATA_FILES_PATH')  # Default to 'data' if not set
 embed_model_id = os.getenv('EMBED_MODEL_ID')
 max_tokens = int(os.getenv('MAX_TOKENS', 512))  # Ensure max_tokens is an integer
 
@@ -123,7 +123,7 @@ def preprocess_text(data_files_path: str):
         return []
     
     # Initialize the tokenizer
-    tokenizer = initialize_tokenizer(embed_model_id)
+    tokenizer = initialize_tokenizer("EleutherAI/gpt-neo-125M")
     
     # Process each file in the raw data directory with tqdm progress bar
     pdf_files = list(data_files_path.glob("*.pdf"))

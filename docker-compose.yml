@@ -3,7 +3,6 @@ version: '3.8'
 services:
   db:
     image: ankane/pgvector:latest
-    restart: always
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -27,7 +26,7 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: db
-      POSTGRES_HOST: db
+      POSTGRES_HOST: localhost
       POSTGRES_PORT: 5432
       PYTHONPATH: /app
     volumes:
