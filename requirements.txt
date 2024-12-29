@@ -13,3 +13,5 @@ transformers
 sentence-transformers
 tqdm
 sqlalchemy
+passlib[bcrypt]
+python-jose

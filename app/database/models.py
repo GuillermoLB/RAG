@@ -19,6 +19,7 @@ class Document(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     title = Column(String, nullable=False)
+    user = relationship("User", back_populates="documents")  # Many-to-One relationship
     chunks = relationship("Chunk", back_populates="document")
 
 class Chunk(Base):

@@ -1,12 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-class TokenData(BaseModel):
-    username: Optional[str] = None
+from typing import Optional, List
 
 class UserBase(BaseModel):
     username: str
@@ -26,3 +19,38 @@ class User(UserInDBBase):
 
 class UserInDB(UserInDBBase):
     hashed_password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
+
+class ChunkBase(BaseModel):
+    content: str
+    embedding: List[float]
+
+class ChunkCreate(ChunkBase):
+    pass
+
+class Chunk(ChunkBase):
+    id: int
+    document_id: int
+
+    class Config:
+        orm_mode = True
+
+class DocumentBase(BaseModel):
+    title: str
+
+class DocumentCreate(DocumentBase):
+    chunks: List[ChunkCreate]
+
+class Document(DocumentBase):
+    id: int
+    user_id: Optional[int]
+    chunks: List[Chunk]
+
+    class Config:
+        orm_mode = True
