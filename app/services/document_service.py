@@ -1,7 +1,7 @@
-from app.database.relational_db import get_db, store_document
 from app.utils.preprocessing import preprocess_text
-# from app.models.embedding_model import get_embeddings
-# from app.database.vector_store import store_vector
+from app.schemas import DocumentCreate, ChunkCreate
+from app.database.relational_db import get_db, store_document
+from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import os
 
@@ -11,9 +11,11 @@ load_dotenv()
 # Access environment variables
 data_files_path = os.getenv('DATA_FILES_PATH')
 
-def ingest_document():
-    # Preprocess the document text to get chunks
-    preprocess_text(data_files_path)
+async def ingest_document(db: Session):
+    chunk_data = preprocess_text(data_files_path)
+    chunks = [ChunkCreate(**chunk) for chunk in chunk_data]
+    document = DocumentCreate(title="Sample Document", chunks=chunks)
+    store_document(db, document)
 
 if __name__ == "__main__":
     ingest_document()

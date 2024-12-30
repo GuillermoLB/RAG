@@ -1,15 +1,17 @@
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
-from pydantic import BaseModel
+from app.schemas import TokenData
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Secret key to encode and decode JWT tokens
-SECRET_KEY = "your_secret_key"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-class TokenData(BaseModel):
-    username: Optional[str] = None
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()

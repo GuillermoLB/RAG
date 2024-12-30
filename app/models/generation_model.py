@@ -1,9 +1,15 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+import os
+from dotenv import load_dotenv
 
-# Load the model and tokenizer
-tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
-model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M")
+# Load environment variables from .env file
+load_dotenv()
+
+# Load the model and tokenizer using the model identifier from the .env file
+model_id = os.getenv("GENERATOR_MODEL_ID")
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id)
 
 # Set the pad_token to eos_token
 tokenizer.pad_token = tokenizer.eos_token

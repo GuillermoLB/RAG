@@ -1,8 +1,13 @@
 from transformers import AutoTokenizer, AutoModel
 import torch
+import os
+from dotenv import load_dotenv
 
-# Load the model and tokenizer using the correct model identifier
-model_id = "sentence-transformers/all-MiniLM-L6-v2"
+# Load environment variables from .env file
+load_dotenv()
+
+# Load the model and tokenizer using the model identifier from the .env file
+model_id = os.getenv("EMBED_MODEL_ID")
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModel.from_pretrained(model_id)
 
