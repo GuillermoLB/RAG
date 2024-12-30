@@ -41,7 +41,6 @@ def store_document(db: Session, title: str, chunks: list):
     # Store the chunks
     for chunk in chunks:
         chunk_content = chunk['chunk_text']
-        chunk_serialized_text = chunk['serialized_text']
         chunk_embedding = chunk['embedding']
         db_chunk = Chunk(document_id=db_document.id, content=chunk_content, embedding=chunk_embedding)
         db.add(db_chunk)

@@ -1,3 +1,4 @@
+from loguru import logger
 from transformers import AutoTokenizer, AutoModel
 import torch
 import os
@@ -16,3 +17,19 @@ def get_embeddings(text: str):
     with torch.no_grad():
         outputs = model(**inputs)
     return outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
+
+def embed_chunks(chunks):
+    logger.info("Embedding chunks")
+    chunk_data = []
+    for i, chunk in enumerate(chunks):
+        txt_tokens = len(tokenizer.tokenize(chunk.text, max_length=None))
+        embedding = get_embeddings(chunk.text)
+        chunk_info = {
+            "index": i,
+            "chunk_text": chunk.text,
+            "chunk_text_tokens": txt_tokens,
+            "embedding": embedding,
+        }
+        chunk_data.append(chunk_info)
+    logger.info(f"Chunked {len(chunks)} chunks")
+    return chunk_data

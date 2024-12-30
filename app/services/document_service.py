@@ -1,4 +1,6 @@
 from app.utils.preprocessing import preprocess_text
+from app.utils.chunking import chunk_document
+from app.utils.embedding import embed_chunks
 from app.schemas import DocumentCreate, ChunkCreate
 from app.database.relational_db import get_db, store_document
 from sqlalchemy.orm import Session
@@ -9,13 +11,15 @@ import os
 load_dotenv()
 
 # Access environment variables
-data_files_path = os.getenv('DATA_FILES_PATH')
+data_file_path = os.getenv('DATA_FILE_PATH')
 
-async def ingest_document(db: Session):
-    chunk_data = preprocess_text(data_files_path)
-    chunks = [ChunkCreate(**chunk) for chunk in chunk_data]
-    document = DocumentCreate(title="Sample Document", chunks=chunks)
-    store_document(db, document)
+def ingest_document(db: Session):
+    document = preprocess_text(data_file_path)
+    chunks = chunk_document(document)
+    embedded_chunks = embed_chunks(chunks)
+    store_document(db, data_file_path, embedded_chunks)
 
 if __name__ == "__main__":
-    ingest_document()
+    # Create a new database session
+    db = next(get_db())
+    ingest_document(db)
