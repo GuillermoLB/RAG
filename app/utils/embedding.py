@@ -1,38 +1,32 @@
 import os
-
-import torch
 from dotenv import load_dotenv
 from loguru import logger
-from transformers import AutoModel, AutoTokenizer
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_core.documents import Document
 
 # Load environment variables from .env file
 load_dotenv()
 
-# Load the model and tokenizer using the model identifier from the .env file
+# Load the model identifier from the .env file
 model_id = os.getenv("EMBED_MODEL_ID")
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModel.from_pretrained(model_id)
 
+# Initialize HuggingFaceEmbeddings
+embeddings_model = HuggingFaceEmbeddings(model_name=model_id)
 
 def get_embeddings(text: str):
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
-    with torch.no_grad():
-        outputs = model(**inputs)
-    return outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
-
+    return embeddings_model.embed_text(text)
 
 def embed_chunks(chunks):
     logger.info("Embedding chunks")
+    chunk_texts = [chunk.page_content if isinstance(chunk, Document) else chunk for chunk in chunks]
+    embeddings = embeddings_model.embed_documents(chunk_texts)
     chunk_data = []
-    for i, chunk in enumerate(chunks):
-        txt_tokens = len(tokenizer.tokenize(chunk.text, max_length=None))
-        embedding = get_embeddings(chunk.text)
+    for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
         chunk_info = {
             "index": i,
-            "chunk_text": chunk.text,
-            "chunk_text_tokens": txt_tokens,
-            "embedding": embedding,
+            "chunk_text": chunk.page_content if isinstance(chunk, Document) else chunk,
+            "embedding": embedding
         }
         chunk_data.append(chunk_info)
-    logger.info(f"Chunked {len(chunks)} chunks")
     return chunk_data
+

@@ -11,9 +11,28 @@ from pathlib import Path
 from docling.document_converter import DocumentConverter
 from dotenv import load_dotenv
 from loguru import logger
+from langchain_core.document_loaders import BaseLoader
+
+from typing import Iterator
+
+from langchain_core.document_loaders import BaseLoader
+from langchain_core.documents import Document as LCDocument
+
+from docling.document_converter import DocumentConverter
 
 load_dotenv()
 
+class DoclingPDFLoader(BaseLoader):
+
+    def __init__(self, file_path: str | list[str]) -> None:
+        self._file_paths = file_path if isinstance(file_path, list) else [file_path]
+        self._converter = DocumentConverter()
+
+    def lazy_load(self) -> Iterator[LCDocument]:
+        for source in self._file_paths:
+            dl_doc = self._converter.convert(source).document
+            text = dl_doc.export_to_markdown()
+            yield LCDocument(page_content=text)
 
 def convert_document(input_path: Path):
     """
@@ -25,10 +44,9 @@ def convert_document(input_path: Path):
     Returns:
         Document: The converted document.
     """
-    logger.info(f"Converting document: {input_path}")
-    converter = DocumentConverter()
-    result = converter.convert(input_path)
-    return result.document
+    loader = DoclingPDFLoader(input_path)
+    result = loader.load()
+    return result
 
 
 def preprocess_text(data_file_path: str):

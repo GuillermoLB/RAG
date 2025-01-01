@@ -1,10 +1,9 @@
 import os
 
-from docling.chunking import HybridChunker
 from dotenv import load_dotenv
 from loguru import logger
 
-from transformers import AutoTokenizer
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Add the root directory to sys.path
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -20,11 +19,8 @@ max_tokens = int(os.getenv("MAX_TOKENS"))
 
 def chunk_document(document):
     logger.info(f"Initializing tokenizer with model ID: {model_id}")
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
     logger.info("Chunking document")
-    chunker = HybridChunker(
-        tokenizer=tokenizer,
-        max_tokens=max_tokens,
-    )
-    chunk_iter = chunker.chunk(dl_doc=document)
-    return list(chunk_iter)
+    
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=0)
+    texts = text_splitter.split_documents(document)
+    return texts
