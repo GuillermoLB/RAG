@@ -1,10 +1,10 @@
 from app.repos.sql.vector_repo import search_vectors
-from app.utils.embedding import get_embeddings
+from app.utils.embedding import embed_query
 from app.utils.response_generation import generate_response
 
 
 def process_query(query: str) -> str:
-    query_embedding = get_embeddings(query)
+    query_embedding = embed_query(query)
     retrieved_docs = search_vectors(query_embedding)
     context = " ".join(retrieved_docs)
     response = generate_response(query, context)

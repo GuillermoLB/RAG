@@ -13,8 +13,8 @@ model_id = os.getenv("EMBED_MODEL_ID")
 # Initialize HuggingFaceEmbeddings
 embeddings_model = HuggingFaceEmbeddings(model_name=model_id)
 
-def get_embeddings(text: str):
-    return embeddings_model.embed_text(text)
+def embed_query(text: str):
+    return embeddings_model.embed_query(text)
 
 def embed_chunks(chunks):
     logger.info("Embedding chunks")
