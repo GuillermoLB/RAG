@@ -1,8 +1,10 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+
 from app.database.models import User as UserModel
 from app.schemas import UserCreate
 from app.utils.security import get_password_hash
+
 
 def create_user(db: Session, user: UserCreate):
     db_user = db.query(UserModel).filter(UserModel.username == user.username).first()

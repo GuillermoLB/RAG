@@ -1,11 +1,15 @@
+from typing import List, Optional
+
 from pydantic import BaseModel
-from typing import Optional, List
+
 
 class UserBase(BaseModel):
     username: str
 
+
 class UserCreate(UserBase):
     password: str
+
 
 class UserInDBBase(UserBase):
     id: Optional[int] = None
@@ -14,25 +18,32 @@ class UserInDBBase(UserBase):
     class Config:
         orm_mode = True
 
+
 class User(UserInDBBase):
     pass
 
+
 class UserInDB(UserInDBBase):
     hashed_password: str
+
 
 class Token(BaseModel):
     access_token: str
     token_type: str
 
+
 class TokenData(BaseModel):
     username: Optional[str] = None
+
 
 class ChunkBase(BaseModel):
     content: str
     embedding: List[float]
 
+
 class ChunkCreate(ChunkBase):
     pass
+
 
 class Chunk(ChunkBase):
     id: int
@@ -41,11 +52,14 @@ class Chunk(ChunkBase):
     class Config:
         orm_mode = True
 
+
 class DocumentBase(BaseModel):
     title: str
 
+
 class DocumentCreate(DocumentBase):
     chunks: List[ChunkCreate]
+
 
 class Document(DocumentBase):
     id: int

@@ -28,9 +28,10 @@ clean:
 lint:
 	flake8 app tests
 
-## Format using black
+## Format using black and isort
 .PHONY: format
 format:
+	isort app tests
 	black app tests
 
 ## Set up python interpreter environment

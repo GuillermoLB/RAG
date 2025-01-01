@@ -1,14 +1,17 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.services.document_service import ingest_document
-from app.dependencies import get_current_active_user
+
+from app.dependencies import get_current_active_user, get_db
 from app.schemas import User
-from app.dependencies import get_db
+from app.services.document_service import ingest_document
 
 router = APIRouter()
 
+
 @router.post("/ingest")
-async def ingest_document_endpoint(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+async def ingest_document_endpoint(
+    current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)
+):
     try:
         # Await the ingest_document function
         ingest_document(db)
