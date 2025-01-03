@@ -1,7 +1,7 @@
 import numpy as np
 from sqlalchemy.orm import Session
 
-from app.database.models import Chunk, Document
+from app.domain.models import Chunk, Document
 from app.dependencies import get_db
 
 

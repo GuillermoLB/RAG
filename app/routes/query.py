@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.schemas import User
+from app.domain.schemas import User
 from app.services.query_service import process_query
 
 from ..dependencies import SessionDep, UserDep

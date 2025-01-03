@@ -1,6 +1,6 @@
 import numpy as np
 
-from app.database.models import Chunk
+from app.domain.models import Chunk
 from app.dependencies import get_db
 
 

@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from app.schemas import TokenData
+from app.domain.schemas import TokenData
 
 # Load environment variables from .env file
 load_dotenv()

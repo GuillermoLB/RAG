@@ -18,6 +18,27 @@ def ingest_document(db: Session):
     chunks = chunk_document(document)
     embedded_chunks = embed_chunks(chunks)
     store_document(db, data_file_path, embedded_chunks)
+    
+def split_document_and_index_chunks(
+    session: Session,
+    document: Document,
+    embeddings: Embeddings,
+    parsing: Parsing,
+    chunk_store: PGVector = None,
+):
+    if document.has_layout():
+        # index layout blocks
+        blocks = ocr.get_layout_blocks(parsing)
+        retriever_service.index_blocks(blocks, document, embeddings)
+        # mark sections
+        category = document.get_effective_category()
+        if category.has_sections():
+            entries = category.get_section_entries()
+            mark_sections(session, chunk_store, document, entries, blocks)
+    else:
+        # index chunks
+        chunks = retriever_service.split_text_into_chunks(parsing.text)
+        retriever_service.index_chunks(chunks, document, embeddings)
 
 
 if __name__ == "__main__":
