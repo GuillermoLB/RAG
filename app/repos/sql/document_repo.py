@@ -6,22 +6,10 @@ from app.dependencies import get_db
 
 
 # Method to store a new document along with its chunks
-def store_document(db: Session, title: str, chunks: list):
+def store_document(db: Session, title: str):
     # Store the document
     db_document = Document(title=title)
     db.add(db_document)
-    db.commit()
-    db.refresh(db_document)
-
-    # Store the chunks
-    for chunk in chunks:
-        chunk_content = chunk["chunk_text"]
-        chunk_embedding = chunk["embedding"]
-        db_chunk = Chunk(
-            document_id=db_document.id, content=chunk_content, embedding=chunk_embedding
-        )
-        db.add(db_chunk)
-
     db.commit()
     return db_document
 

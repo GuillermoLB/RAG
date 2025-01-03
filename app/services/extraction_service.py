@@ -56,4 +56,4 @@ def extract_text(data_file_path: str):
     # Log the processed document
     logger.info(f"Processed document: {doc}")
 
-    return doc
+    return doc[0]
