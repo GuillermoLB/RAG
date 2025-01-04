@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_current_active_user, get_db
 from app.domain.schemas import User
-from app.services.document_service import ingest_document
+from app.services.document_service import extract_document
 
 router = APIRouter()
 
@@ -14,7 +14,7 @@ async def ingest_document_endpoint(
 ):
     try:
         # Await the ingest_document function
-        ingest_document(db)
+        extract_document(db)
         return {"message": "Document ingested successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

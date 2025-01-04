@@ -6,6 +6,9 @@ PROJECT_NAME = embedding-module
 PYTHON_VERSION = 3.12
 PYTHON_INTERPRETER = python
 
+# Set the PYTHONPATH environment variable
+export PYTHONPATH := $(shell pwd)
+
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################

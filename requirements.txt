@@ -15,3 +15,6 @@ tqdm
 sqlalchemy
 passlib[bcrypt]
 python-jose
+langchain
+langchain-core
+langchain-community
