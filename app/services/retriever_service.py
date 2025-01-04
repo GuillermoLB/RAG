@@ -12,8 +12,6 @@ from langchain_core.documents import Document as LCDocument
 from app.core.config import Settings, settings
 
 
-from app.domain.models import Document
-
 def get_vector_store(
     settings: Settings, collection_name: str, embeddings: Embeddings
 ) -> PGVector:
@@ -36,7 +34,7 @@ def split_text_into_chunks(document: LCDocument) -> list[LCDocument]:
     chunks = text_splitter.split_documents([document])
     return chunks
 
-def index_chunks(chunks: list[LCDocument], document: Document, embeddings: Embeddings):
+def index_chunks(chunks: list[LCDocument], embeddings: Embeddings):
     vector_store = PGVector(
         embeddings=embeddings,
         collection_name="docs",

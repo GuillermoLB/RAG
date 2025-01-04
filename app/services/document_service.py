@@ -27,7 +27,6 @@ embeddings = HuggingFaceEmbeddings(model_name=embed_model_id)
 def extract_document(db: Session):
     document = extract_text(data_file_path)
     split_document_and_index_chunks(db, document, embeddings)
-    store_document(db, document)
 
 def split_document_and_index_chunks(
     session: Session,

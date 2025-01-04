@@ -18,3 +18,4 @@ python-jose
 langchain
 langchain-core
 langchain-community
+alembic
