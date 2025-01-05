@@ -1,31 +1,25 @@
-import logging
-
-from langchain.retrievers import EnsembleRetriever
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores.pgvector import DistanceStrategy, PGVector
-from langchain_community.retrievers import BM25Retriever
+from langchain_community.vectorstores import PGVector
 from langchain_core.embeddings import Embeddings
-from sqlalchemy import String, cast, func, select, update
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Session
 from langchain_core.documents import Document as LCDocument
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from app.core.config import Settings, settings
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+model_id = os.getenv("RESPONSE_GENERATION_MODEL_ID")
 
 def get_vector_store(
-    settings: Settings, collection_name: str, embeddings: Embeddings
+    collection_name: str, embeddings: Embeddings
 ) -> PGVector:
     return PGVector(
         collection_name=collection_name,
         connection_string=settings.get_connection_str(),
         embedding_function=embeddings,
-        distance_strategy=DistanceStrategy.COSINE,
     )
     
-
-    
 def split_text_into_chunks(document: LCDocument) -> list[LCDocument]:
-    #logger.info("Splitting document into smaller chunks")
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=200,
         chunk_overlap=0,
@@ -35,26 +29,11 @@ def split_text_into_chunks(document: LCDocument) -> list[LCDocument]:
     return chunks
 
 def index_chunks(chunks: list[LCDocument], embeddings: Embeddings):
-    vector_store = PGVector(
-        embeddings=embeddings,
+    vector_store = PGVector.from_documents(
+        documents=chunks,
+        embedding=embeddings,
         collection_name="docs",
-        connection=settings.get_connection_str(),
+        connection_string=settings.get_connection_str(),
         use_jsonb=True,
     )
-    
-# def retrieve_relevant_chunks(
-#     store: PGVector,
-#     filter: dict,
-#     threshold: float,
-#     query: str,
-# ) -> list[LDocument]:
-#     similarity_retriever = store.as_retriever(
-#         search_type="similarity_score_threshold",
-#         search_kwargs={
-#             "k": 20,
-#             "score_threshold": threshold,
-#             "filter": filter,
-#         },
-#     )
-#     similar_chunks = similarity_retriever.get_relevant_documents(query=query)
-#     return similar_chunks[:5]
+    return vector_store
