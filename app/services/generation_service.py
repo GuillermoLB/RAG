@@ -44,7 +44,7 @@ def generate_response(query: str) -> str:
     )
     
     question_answer_chain = create_stuff_documents_chain(llm, prompt)
-    rag_chain = create_retrieval_chain(vector_store.as_retriever, question_answer_chain)
+    rag_chain = create_retrieval_chain(vector_store.as_retriever(), question_answer_chain)
 
     response = rag_chain.invoke({"input": query})
     return response
@@ -52,5 +52,5 @@ def generate_response(query: str) -> str:
 if __name__ == "__main__":
     # Create a new database session
     db = next(get_db())
-    generate_response("Who is Guillermo?")
-
+    response = generate_response("Who is Guillermo?")
+    print(response)
