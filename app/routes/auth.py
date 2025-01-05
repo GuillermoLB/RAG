@@ -2,11 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app.domain import schemas
 from app.dependencies import authenticate_user, get_db
+from app.domain import schemas
 from app.repos.sql.user_repo import create_user
 from app.utils.security import create_access_token
+from app.core.config import Settings
 
+settings = Settings()
 router = APIRouter()
 
 
@@ -21,7 +23,7 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = create_access_token(data={"sub": user.username})
+    access_token = create_access_token(data={"sub": user.username}, settings=settings)
     return {"access_token": access_token, "token_type": "bearer"}
 
 

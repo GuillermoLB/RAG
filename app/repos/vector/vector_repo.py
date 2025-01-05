@@ -1,7 +1,7 @@
 import numpy as np
 
-from app.domain.models import Chunk
 from app.dependencies import get_db
+from app.domain.models import Chunk
 
 
 def search_vectors(query_embedding: np.ndarray, top_k: int = 5) -> list:

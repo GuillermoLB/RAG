@@ -1,8 +1,8 @@
 import numpy as np
 from sqlalchemy.orm import Session
 
-from app.domain.models import Chunk
 from app.dependencies import get_db
+from app.domain.models import Chunk
 
 
 # Method to store a new document along with its chunks

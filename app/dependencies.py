@@ -1,37 +1,29 @@
-import os
+from functools import lru_cache
 from typing import Annotated
 
-from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from app.core.config import Settings
 from app.domain.models import User as UserModel
 from app.domain.schemas import User
 from app.utils.security import verify_password, verify_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# Load the .env file
-load_dotenv()
-
-# Access environment variables
-POSTGRES_USER = os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-POSTGRES_DB = os.getenv("POSTGRES_DB")
-POSTGRES_HOST = os.getenv("POSTGRES_HOST")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT")
+@lru_cache
+def get_settings():
+    return Settings()
 
 # Create the SQLAlchemy engine
-DATABASE_URL = f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-engine = create_engine(DATABASE_URL)
+engine = create_engine(get_settings().get_connection_str())
 
 # Create a configured "Session" class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-# Dependency to get the database session
 def get_db():
     db = SessionLocal()
     try:
@@ -57,7 +49,7 @@ def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    token_data = verify_token(token, credentials_exception)
+    token_data = verify_token(token, get_settings(),credentials_exception)
     user = db.query(UserModel).filter(UserModel.username == token_data.username).first()
     if user is None:
         raise credentials_exception

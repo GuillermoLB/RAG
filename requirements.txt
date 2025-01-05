@@ -20,3 +20,5 @@ langchain-core
 langchain-community
 alembic
 langchain_ollama
+isort
+pydantic-settings

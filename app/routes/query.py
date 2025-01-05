@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+
 from app.services.generation_service import generate_response
 
 from ..dependencies import SessionDep, UserDep
