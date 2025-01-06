@@ -11,6 +11,6 @@ router = APIRouter()
 async def handle_query(query: str, current_user: UserDep):
     try:
         response = generate_response(query)
-        return {"response": response}
+        return {"response": response["answer"]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
