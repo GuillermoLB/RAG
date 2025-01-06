@@ -28,7 +28,7 @@ def index_chunks(chunks: list[LCDocument], settings: Settings, embeddings: Embed
     vector_store = PGVector.from_documents(
         documents=chunks,
         embedding=embeddings,
-        collection_name="docs2",
+        collection_name="docs",
         connection_string=settings.get_connection_str(),
         use_jsonb=True,
     )
