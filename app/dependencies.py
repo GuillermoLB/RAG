@@ -5,11 +5,13 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from langchain_core.embeddings import Embeddings
 
 from app.core.config import Settings
 from app.domain.models import User as UserModel
 from app.domain.schemas import User
 from app.utils.security import verify_password, verify_token
+from langchain.embeddings import HuggingFaceEmbeddings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -31,6 +33,8 @@ def get_db():
     finally:
         db.close()
 
+def get_embeddings():
+    return HuggingFaceEmbeddings(model_name=get_settings().EMBED_MODEL_ID)
 
 def authenticate_user(db: Session, username: str, password: str):
     user = db.query(UserModel).filter(UserModel.username == username).first()
@@ -63,4 +67,6 @@ def get_current_active_user(current_user: User = Depends(get_current_user)):
 
 
 SessionDep = Annotated[Session, Depends(get_db)]
+SettingsDep = Depends(get_settings)
 UserDep = Annotated[User, Depends(get_current_active_user)]
+EmbeddingsDep = Annotated[Embeddings, Depends(get_embeddings)]

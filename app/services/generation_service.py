@@ -1,28 +1,23 @@
-from langchain.chains import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_core.embeddings import Embeddings
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_ollama import ChatOllama
-
-from app.dependencies import get_settings
-from app.dependencies import get_db
+from typing import Any
+from fastapi import Depends
+from loguru import logger
+from app.dependencies import get_settings, get_embeddings
 from app.services.retriever_service import get_vector_store
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains.retrieval import create_retrieval_chain
+
+from langchain_ollama import ChatOllama
+from langchain_core.vectorstores.base import VectorStoreRetriever
 
 settings = get_settings()
 
-model_id = settings.RESPONSE_MODEL_ID
-embed_model_id = settings.EMBED_MODEL_ID
+def initialize_llm(model_id: str) -> ChatOllama:
+    return ChatOllama(model=model_id, temperature=0)
 
-embeddings = HuggingFaceEmbeddings(model_name=embed_model_id)
 
-def generate_response(query: str) -> str:
-    llm = ChatOllama(
-    model=model_id,
-    temperature=0
-    )
-    vector_store = get_vector_store("docs", embeddings, settings)
-    
+def generate_response(query: str, llm: ChatOllama, retriever: VectorStoreRetriever) -> str:
+    logger.info(f"Enter generator")
     system_prompt = (
         "You are an assistant for question-answering tasks. "
         "Use the following pieces of retrieved context to answer "
@@ -32,7 +27,7 @@ def generate_response(query: str) -> str:
         "\n\n"
         "{context}"
     )
-
+    logger.info("Before ChatPromptTemplate")
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", system_prompt),
@@ -40,14 +35,22 @@ def generate_response(query: str) -> str:
         ]
     )
     
+        
     question_answer_chain = create_stuff_documents_chain(llm, prompt)
-    rag_chain = create_retrieval_chain(vector_store.as_retriever(), question_answer_chain)
+    rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
     response = rag_chain.invoke({"input": query})
+
     return response
 
-if __name__ == "__main__":
-    # Create a new database session
-    db = next(get_db())
-    response = generate_response("Who is Guillermo?")
+def main(embeddings=Depends(get_embeddings)):
+    model_id = settings.RESPONSE_MODEL_ID
+    llm = initialize_llm(model_id)
+    vector_store = get_vector_store("docs", embeddings, settings)
+
+    query = "Who is Guillermo?"
+    response = generate_response(query, llm, vector_store)
     print(response)
+
+if __name__ == "__main__":
+    main()
