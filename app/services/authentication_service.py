@@ -4,6 +4,8 @@ from typing import Optional
 from dotenv import load_dotenv
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
+from app.domain.models import User as UserModel
 
 from app.domain.schemas import TokenData
 
@@ -37,3 +39,11 @@ def verify_token(token: str, settings, credentials_exception):
     except JWTError:
         raise credentials_exception
     return token_data
+
+def authenticate_user(db: Session, username: str, password: str):
+    user = db.query(UserModel).filter(UserModel.username == username).first()
+    if not user:
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+    return user
