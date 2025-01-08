@@ -17,7 +17,6 @@ def initialize_llm(model_id: str) -> ChatOllama:
 
 
 def generate_response(query: str, llm: ChatOllama, retriever: VectorStoreRetriever) -> str:
-    logger.info(f"Enter generator")
     system_prompt = (
         "You are an assistant for question-answering tasks. "
         "Use the following pieces of retrieved context to answer "
@@ -27,7 +26,6 @@ def generate_response(query: str, llm: ChatOllama, retriever: VectorStoreRetriev
         "\n\n"
         "{context}"
     )
-    logger.info("Before ChatPromptTemplate")
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", system_prompt),

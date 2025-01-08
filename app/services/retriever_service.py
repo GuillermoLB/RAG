@@ -1,3 +1,4 @@
+from loguru import logger
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import PGVector
 from langchain_core.documents import Document as LCDocument
@@ -7,6 +8,7 @@ from langchain_core.vectorstores.base import VectorStoreRetriever
 from app.dependencies import get_settings, get_embeddings
 
 from app.core.config import Settings
+from app.repos.vector.pgvector_repo import VectorIndex
 
 
 def get_vector_store(collection_name: str, documents: LCDocument,embeddings=Depends(get_embeddings), settings=Settings)->PGVector:
@@ -37,11 +39,10 @@ def split_text_into_chunks(document: LCDocument) -> list[LCDocument]:
     return chunks
 
 def index_chunks(chunks: list[LCDocument], settings: Settings, embeddings: Embeddings):
-    vector_store = PGVector.from_documents(
+    chunks_index = VectorIndex(
         documents=chunks,
-        embedding=embeddings,
-        collection_name="docs",
-        connection_string=settings.get_connection_str(),
-        use_jsonb=True,
+        embeddings=embeddings,
     )
-    return vector_store
+    
+    result = chunks_index.index()
+    logger.info(f"Indexed {len(chunks)} chunks")

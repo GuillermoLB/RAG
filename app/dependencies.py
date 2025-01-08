@@ -59,6 +59,6 @@ def get_current_active_user(current_user: User = Depends(get_current_user)):
 
 
 SessionDep = Annotated[Session, Depends(get_db)]
-SettingsDep = Depends(get_settings)
+SettingsDep = Annotated[Settings, Depends(get_settings)]
 UserDep = Annotated[User, Depends(get_current_active_user)]
 EmbeddingsDep = Annotated[Embeddings, Depends(get_embeddings)]

@@ -1,10 +1,8 @@
+from langchain.indexes import SQLRecordManager
 from langchain.indexes import index, IndexingResult
 from langchain.vectorstores.pgvector import PGVector
 from langchain_core.documents import Document as LCDocument
 from langchain_core.embeddings import Embeddings
-
-
-from ...domain.models import PGEmbedding, PGUpsertionRecord
 
 from ...dependencies import get_settings
 
@@ -17,8 +15,13 @@ class VectorIndex:
     ) -> None:
         self.documents = documents
 
+        namespace = f"pgvector/document_chunks"
+        self.record_manager = SQLRecordManager(
+            namespace, db_url=get_settings().get_connection_str()
+        )
+        self.record_manager.create_schema()
         self.vector_store = PGVector(
-            collection_name="docs",
+            collection_name="document_chunks",
             connection_string=get_settings().get_connection_str(),
             embedding_function=embeddings,
         )
@@ -27,4 +30,5 @@ class VectorIndex:
         return index(
             docs_source=self.documents,
             vector_store=self.vector_store,
+            record_manager=self.record_manager
         )
