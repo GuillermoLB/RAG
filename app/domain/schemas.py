@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from pydantic import BaseModel
+from sqlalchemy import Enum
 
 
 class UserBase(BaseModel):
@@ -68,3 +69,16 @@ class Document(DocumentBase):
 
     class Config:
         orm_mode = True
+        
+class LLMType(str, Enum):
+    CHAT_LLM = "CHAT"
+    EMBEDDINGS = "EMBEDDINGS"
+    
+class LLModel(BaseModel):
+    type: str
+    config: dict
+    fake: bool
+
+    model_config = {
+        "arbitrary_types_allowed": True
+    }

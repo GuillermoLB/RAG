@@ -1,7 +1,10 @@
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_core.documents import Document as LCDocument
+from langchain_core.embeddings import Embeddings
+from langchain.vectorstores.pgvector import PGVector
 from sqlalchemy.orm import Session
 
+from app.core.config import Settings
 from app.dependencies import get_settings, get_db
 from app.services import retriever_service
 from app.services.extraction_service import extract_text
@@ -14,12 +17,22 @@ embed_model_id = settings.EMBED_MODEL_ID
 # Initialize the embeddings object
 embeddings = HuggingFaceEmbeddings(model_name=embed_model_id)
 
-def extract_document(db: Session):
+# instantiate once per document
+def get_vector_store(
+    settings: Settings, collection_name: str, embeddings: Embeddings
+) -> PGVector:
+    return PGVector(
+        collection_name=collection_name,
+        connection_string=settings.get_connection_str(),
+        embedding_function=embeddings,
+    )
+
+def extract_document(settings:Settings, embeddings:Embeddings):
     document = extract_text(data_file_path)
-    split_document_and_index_chunks(db, document, embeddings)
+    chunk_store = get_vector_store(settings=settings, collection_name="document_chunks", embeddings=embeddings),
+    split_document_and_index_chunks(document, embeddings)
 
 def split_document_and_index_chunks(
-    session: Session,
     document: LCDocument,
     embeddings: HuggingFaceEmbeddings
 ):

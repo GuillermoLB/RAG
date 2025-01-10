@@ -6,11 +6,12 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from langchain_core.embeddings import Embeddings
+from langchain_core.language_models import BaseLanguageModel
 
-from app.core.config import Settings
+from .core.config import Settings, build_llm
 from app.domain.models import User as UserModel
 from app.domain.schemas import User
-from app.services.authentication_service import verify_password, verify_token
+from app.services.authentication_service import verify_token
 from langchain.embeddings import HuggingFaceEmbeddings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -32,6 +33,9 @@ def get_db():
         yield db
     finally:
         db.close()
+        
+def get_llm():
+    return build_llm(llm=get_settings().CHAT_LLM)
 
 def get_embeddings():
     return HuggingFaceEmbeddings(model_name=get_settings().EMBED_MODEL_ID)
@@ -62,3 +66,4 @@ SessionDep = Annotated[Session, Depends(get_db)]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 UserDep = Annotated[User, Depends(get_current_active_user)]
 EmbeddingsDep = Annotated[Embeddings, Depends(get_embeddings)]
+LLMDep = Annotated[BaseLanguageModel, Depends(get_llm)]

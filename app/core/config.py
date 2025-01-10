@@ -1,5 +1,10 @@
 from dotenv import load_dotenv
+from langchain_ollama import ChatOllama
+from pydantic import BaseModel
 from pydantic_settings import  BaseSettings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+from app.domain.schemas import LLMType, LLModel
 
 # Load environment variables from .env file
 load_dotenv(override=True)
@@ -12,7 +17,11 @@ class Settings(BaseSettings):
     POSTGRES_DB:str= "db"
     EMBED_MODEL_ID:str = "sentence-transformers/all-MiniLM-L6-v2"
     MAX_TOKENS:int=512
-    RESPONSE_MODEL_ID:str = "mistral"
+    CHAT_LLM: LLModel = LLModel(
+        config={"model": "mistral", "temperature": 0.0},
+        type=LLMType.CHAT_LLM,
+        fake=False,
+    )
     DATA_FILE_PATH:str ="data/1.pdf"
     LANGSMITH_API_KEY:str
     LANGSMITH_TRACING:bool=True
@@ -27,3 +36,12 @@ class Settings(BaseSettings):
         Construct and return the database connection string.
         """
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+    
+def build_llm(llm: LLModel) -> BaseModel:
+
+        if llm.type == LLMType.CHAT_LLM:
+            return ChatOllama(**llm.config)
+        elif llm.type == LLMType.EMBEDDINGS:
+            return HuggingFaceEmbeddings(**llm.config)
+        else:
+            pass
