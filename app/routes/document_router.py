@@ -1,15 +1,18 @@
 from fastapi import APIRouter, HTTPException
 
 from app.services.document_service import extract_document
-from ..dependencies import SessionDep, UserDep, EmbeddingsDep, SettingsDep
+
+from ..dependencies import EmbeddingsDep, SessionDep, SettingsDep, UserDep
 
 router = APIRouter()
 
 
 @router.post("/ingest")
 async def ingest_document_endpoint(
-    settings:SettingsDep, db: SessionDep, current_user: UserDep, embeddings: EmbeddingsDep
-):
+        settings: SettingsDep,
+        db: SessionDep,
+        current_user: UserDep,
+        embeddings: EmbeddingsDep):
     try:
         # Await the ingest_document function
         extract_document(settings=settings, embeddings=embeddings)

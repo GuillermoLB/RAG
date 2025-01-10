@@ -69,11 +69,13 @@ class Document(DocumentBase):
 
     class Config:
         orm_mode = True
-        
+
+
 class LLMType(str, Enum):
     CHAT_LLM = "CHAT"
     EMBEDDINGS = "EMBEDDINGS"
-    
+
+
 class LLModel(BaseModel):
     type: str
     config: dict

@@ -1,5 +1,4 @@
-from langchain.indexes import SQLRecordManager
-from langchain.indexes import index, IndexingResult
+from langchain.indexes import IndexingResult, SQLRecordManager, index
 from langchain.vectorstores.pgvector import PGVector
 from langchain_core.documents import Document as LCDocument
 from langchain_core.embeddings import Embeddings

@@ -3,22 +3,25 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseLanguageModel
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
-from .core.config import Settings, build_llm
 from app.domain.models import User as UserModel
 from app.domain.schemas import User
 from app.services.authentication_service import verify_token
-from langchain.embeddings import HuggingFaceEmbeddings
+
+from .core.config import Settings, build_llm
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 @lru_cache
 def get_settings():
     return Settings()
+
 
 # Create the SQLAlchemy engine
 engine = create_engine(get_settings().get_connection_str())
@@ -33,9 +36,11 @@ def get_db():
         yield db
     finally:
         db.close()
-        
+
+
 def get_llm():
     return build_llm(llm=get_settings().CHAT_LLM)
+
 
 def get_embeddings():
     return HuggingFaceEmbeddings(model_name=get_settings().EMBED_MODEL_ID)
@@ -49,8 +54,9 @@ def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    token_data = verify_token(token, get_settings(),credentials_exception)
-    user = db.query(UserModel).filter(UserModel.username == token_data.username).first()
+    token_data = verify_token(token, get_settings(), credentials_exception)
+    user = db.query(UserModel).filter(
+        UserModel.username == token_data.username).first()
     if user is None:
         raise credentials_exception
     return user

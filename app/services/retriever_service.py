@@ -1,17 +1,19 @@
-from loguru import logger
+from fastapi import Depends
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import DistanceStrategy, PGVector
+from langchain_community.vectorstores import PGVector
 from langchain_core.documents import Document as LCDocument
 from langchain_core.embeddings import Embeddings
-from fastapi import Depends
-from langchain_core.vectorstores.base import VectorStoreRetriever
-from app.dependencies import get_settings, get_embeddings
+from loguru import logger
 
 from app.core.config import Settings
+from app.dependencies import get_embeddings, get_settings
 from app.repos.vector.pgvector_repo import VectorIndex
 
 
-def get_vector_store(settings: Settings, collection_name: str, embeddings: Embeddings)->PGVector:
+def get_vector_store(
+        settings: Settings,
+        collection_name: str,
+        embeddings: Embeddings) -> PGVector:
     logger.info(f"Getting vector store for {collection_name}")
     return PGVector(
         embedding_function=embeddings,
@@ -20,7 +22,7 @@ def get_vector_store(settings: Settings, collection_name: str, embeddings: Embed
         use_jsonb=True,
     )
 
-    
+
 def split_text_into_chunks(document: LCDocument) -> list[LCDocument]:
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=200,
@@ -30,7 +32,11 @@ def split_text_into_chunks(document: LCDocument) -> list[LCDocument]:
     chunks = text_splitter.split_documents([document])
     return chunks
 
-def index_chunks(chunks: list[LCDocument], settings: Settings, embeddings: Embeddings):
+
+def index_chunks(
+        chunks: list[LCDocument],
+        settings: Settings,
+        embeddings: Embeddings):
     chunks_index = VectorIndex(
         documents=chunks,
         embeddings=embeddings,

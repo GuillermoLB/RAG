@@ -34,8 +34,7 @@ lint:
 ## Format using black and isort
 .PHONY: format
 format:
-	isort app tests
-	black app tests
+	autopep8 --in-place --aggressive --aggressive -r .
 
 ## Set up python interpreter environment
 .PHONY: create_environment
