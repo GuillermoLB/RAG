@@ -13,7 +13,8 @@
 #     mock_document = LCDocument(page_content="Mocked content")
 
 #     with patch('app.services.document_service.extract_text', return_value=mock_document) as mock_extract_text, \
-#             patch('app.services.document_service.split_document_and_index_chunks') as mock_split_chunks:
+# patch('app.services.document_service.split_document_and_index_chunks')
+# as mock_split_chunks:
 
 #         mock_db = MagicMock(spec=Session)
 
@@ -44,7 +45,8 @@
 #     mock_document.page_content = ""
 
 #     with patch('app.services.document_service.extract_text', return_value=mock_document) as mock_extract_text, \
-#             patch('app.services.document_service.split_document_and_index_chunks') as mock_split_chunks:
+# patch('app.services.document_service.split_document_and_index_chunks')
+# as mock_split_chunks:
 
 #         mock_db = MagicMock()
 
