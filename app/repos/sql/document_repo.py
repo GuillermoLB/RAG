@@ -3,12 +3,13 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
 from app.domain.models import Chunk
+from app.domain.schemas import Document
 
 
-# Method to store a new document along with its chunks
-def store_document(db: Session, title: str):
-    # Store the document
-    db_document = Document(title=title)
-    db.add(db_document)
-    db.commit()
-    return db_document
+def create_document(session: Session, document: Document) -> Document:
+    if not document:
+        return None
+    session.add(document)
+    session.commit()
+    session.refresh(document)
+    return document

@@ -10,6 +10,14 @@ from sqlalchemy.orm import declarative_base, relationship
 Base = declarative_base()
 
 
+class document(Base):
+    __tablename__ = "documents"
+    id = Column(Integer, primary_key=True, unique=True)
+    name = Column(String, index=True)
+    chunks = Column(Integer, nullable=True)
+    uuid = Column(UUID, index=True)
+
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)

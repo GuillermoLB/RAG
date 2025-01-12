@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile
 
+from app.services import document_service
 from app.services.document_service import extract_document
 
 from app.services.qa_service import generate_response
@@ -7,6 +8,30 @@ from app.services.qa_service import generate_response
 from ..dependencies import EmbeddingsDep, LLMDep, SessionDep, SettingsDep, UserDep
 
 router = APIRouter()
+
+
+@router.get("/upload")
+async def upload_document_endpoint(
+        session: SessionDep,
+        settings: SettingsDep,
+        file: UploadFile):
+
+    try:
+        file_name = file.filename
+        document = document_service.validate_document(
+            file_name=file_name,
+            session=session,
+        )
+
+        document = document_service.upload_document(
+            file=file,
+            db=SessionDep,
+            document=document,
+        )
+    except (HTTPException) as e:
+        raise HTTPException(status_code=e.code, detail=str(e))
+
+    return {"message": "Upload a document"}
 
 
 @router.post("/ingest")

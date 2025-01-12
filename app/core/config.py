@@ -23,7 +23,7 @@ class Settings(BaseSettings):
         type=LLMType.CHAT_LLM,
         fake=False,
     )
-    DATA_FILE_PATH: str = "data/1.pdf"
+    DATA_FILE_PATH: str = "data"
     LANGSMITH_API_KEY: str
     LANGSMITH_TRACING: bool = True
     LANGCHAIN_PROJECT: str
