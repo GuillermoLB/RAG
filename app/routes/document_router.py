@@ -10,7 +10,7 @@ from ..dependencies import EmbeddingsDep, LLMDep, SessionDep, SettingsDep, UserD
 router = APIRouter()
 
 
-@router.get("/upload")
+@router.post("/upload")
 async def upload_document_endpoint(
         session: SessionDep,
         settings: SettingsDep,
@@ -25,7 +25,7 @@ async def upload_document_endpoint(
 
         document = document_service.upload_document(
             file=file,
-            db=SessionDep,
+            session=session,
             document=document,
         )
     except (HTTPException) as e:

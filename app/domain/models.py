@@ -10,7 +10,7 @@ from sqlalchemy.orm import declarative_base, relationship
 Base = declarative_base()
 
 
-class document(Base):
+class Document(Base):
     __tablename__ = "documents"
     id = Column(Integer, primary_key=True, unique=True)
     name = Column(String, index=True)

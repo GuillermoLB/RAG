@@ -8,13 +8,15 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.dependencies import get_db, get_settings
-from app.domain.schemas import Document
+from app.domain.models import Document
+from app.ocr.file_handler import save_tmp_copy
 from app.repos.sql import document_repo
 from app.services import retriever_service
 from app.services.extraction_service import extract_text
-from app.repos.filesystem import local_repo
+from app.repos.filesystem.local_repo import LocalFileSystemRepository
 
 settings = get_settings()
+local_repo = LocalFileSystemRepository()
 data_file_path = settings.DATA_FILE_PATH
 embed_model_id = settings.EMBED_MODEL_ID
 
@@ -41,12 +43,12 @@ def upload_document(
     document: Document
 ) -> Document:
     logger.info(f"Uploading document {document.name}")
-    uploaded_document = local_repo.upload_document(
-        document=document, file_path=settings.DATA_FILE_PATH)
+    local_repo.upload_document(
+        file=file, files_path=settings.DATA_FILE_PATH)
     db_document = document_repo.create_document(
-        session=session, document=uploaded_document)
+        session=session, document=document)
 
-    return db_document
+    return document
 
 
 def extract_document(settings: Settings, embeddings: Embeddings):
