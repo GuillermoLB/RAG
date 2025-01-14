@@ -1,14 +1,18 @@
 import pathlib
+from typing import AsyncGenerator
 import uuid
 from factory.alchemy import SQLAlchemyModelFactory
 from factory import Sequence
+from httpx import AsyncClient
 import psycopg2
+import pytest_asyncio
 from sqlalchemy import UUID, Engine, create_engine
 from app.domain.models import Document, User, Base
 import pytest
 from alembic import command
 from alembic.config import Config
 from pgvector.psycopg2 import register_vector
+from app.main import app
 from sqlalchemy.orm import scoped_session, sessionmaker
 from langchain.vectorstores.pgvector import PGVector
 from app.core.config import Settings
@@ -97,6 +101,12 @@ def session(engine: Engine, tables):
     transaction.rollback()
     # session.close()
     scopedsession.remove()
+
+
+@pytest_asyncio.fixture()
+async def client() -> AsyncGenerator:
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        yield client
 
 
 class UserFactory(SQLAlchemyModelFactory):

@@ -48,7 +48,7 @@ def upload_document(
     db_document = document_repo.create_document(
         session=session, document=document)
 
-    return document
+    return db_document
 
 
 def extract_document(settings: Settings, embeddings: Embeddings):
