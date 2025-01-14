@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "your_secret_key"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    VECTOR_DIMENSION: int = 768
 
     def get_connection_str(self):
         """
