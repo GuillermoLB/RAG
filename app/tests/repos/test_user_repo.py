@@ -4,6 +4,7 @@ import pytest
 
 from app.domain.schemas import UserCreate
 from app.repos.sql import user_repo
+from app.tests.conftest import DocumentFactory, UserFactory, session
 
 
 def test_create_user_works(session):

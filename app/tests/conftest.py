@@ -1,8 +1,10 @@
 import pathlib
+import uuid
 from factory.alchemy import SQLAlchemyModelFactory
+from factory import Sequence
 import psycopg2
-from sqlalchemy import Engine, create_engine
-from app.domain.models import User, Base
+from sqlalchemy import UUID, Engine, create_engine
+from app.domain.models import Document, User, Base
 import pytest
 from alembic import command
 from alembic.config import Config
@@ -13,8 +15,6 @@ from app.core.config import Settings
 from app.dependencies import get_embeddings, get_settings
 
 from app.database import database, password, port, server, user
-
-scopedsession = scoped_session(sessionmaker())
 
 
 @pytest.fixture(scope="session")
@@ -81,7 +81,10 @@ def tables(engine, settings: Settings, embeddings):
     Base.metadata.drop_all(engine)
 
 
-@pytest.fixture(scope="session")
+scopedsession = scoped_session(sessionmaker())
+
+
+@pytest.fixture
 def session(engine: Engine, tables):
     """Returns an sqlalchemy session, and after the test tears down everything properly."""
     connection = engine.connect()
@@ -99,8 +102,18 @@ def session(engine: Engine, tables):
 class UserFactory(SQLAlchemyModelFactory):
     class Meta:
         model = User
-        sqlalchemy_session = session
+        sqlalchemy_session = scopedsession
         sqlalchemy_session_persistence = "flush"
     username = "test_user"
     hashed_password = "test_password"
     disabled = False
+
+
+class DocumentFactory(SQLAlchemyModelFactory):
+    class Meta:
+        model = Document
+        sqlalchemy_session = scopedsession
+        sqlalchemy_session_persistence = "flush"
+
+    uuid = Sequence(lambda n: str(uuid.uuid4()))
+    name = Sequence(lambda n: f"document{n+1}.pdf")

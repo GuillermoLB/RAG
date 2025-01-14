@@ -1,10 +1,12 @@
-import uuid
+from typing import Optional
+from uuid import UUID
 
+import uuid
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import (ARRAY, JSON, UUID, Boolean, Column, ForeignKey,
+from sqlalchemy import (ARRAY, JSON, Boolean, Column, ForeignKey,
                         Integer, String)
-from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import declarative_base, relationship, Mapped, mapped_column
 
 # Create a Base class for the models
 Base = declarative_base()
@@ -12,10 +14,10 @@ Base = declarative_base()
 
 class Document(Base):
     __tablename__ = "documents"
-    id = Column(Integer, primary_key=True, unique=True)
-    name = Column(String, index=True)
-    chunks = Column(Integer, nullable=True)
-    uuid = Column(UUID, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, unique=True)
+    name: Mapped[str] = mapped_column(String, index=True)
+    chunks: Mapped[Optional[int]] = mapped_column(Integer)
+    uuid: Mapped[UUID] = mapped_column(index=True)
 
 
 class User(Base):
@@ -31,18 +33,19 @@ class LangchainPgCollection(Base):
 
     name = Column(String)
     cmetadata = Column(JSON)
-    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    uuid: Mapped[UUID] = mapped_column(primary_key=True)
 
 
 class LangchainPgEmbedding(Base):
     __tablename__ = 'langchain_pg_embedding'
 
-    collection_id = Column(UUID(as_uuid=True), ForeignKey(
-        'langchain_pg_collection.uuid'), nullable=False)
+    collection_id: Mapped[UUID] = mapped_column(
+        ForeignKey("langchain_pg_collection.uuid")
+    )
     embedding = Column(Vector)
     document = Column(String)
     cmetadata = Column(JSONB)
     custom_id = Column(String)
-    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    uuid: Mapped[UUID] = mapped_column(primary_key=True)
 
     collection = relationship("LangchainPgCollection", backref="embeddings")
