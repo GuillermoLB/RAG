@@ -3,6 +3,7 @@ from typing import AsyncGenerator
 import uuid
 from factory.alchemy import SQLAlchemyModelFactory
 from factory import Sequence
+from fastapi import FastAPI
 from httpx import AsyncClient
 import psycopg2
 import pytest_asyncio
@@ -12,11 +13,11 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from pgvector.psycopg2 import register_vector
-from app.main import app
+
 from sqlalchemy.orm import scoped_session, sessionmaker
 from langchain.vectorstores.pgvector import PGVector
 from app.core.config import Settings
-from app.dependencies import get_embeddings, get_settings
+from app.dependencies import get_embeddings, get_settings, get_session
 
 from app.database import database, password, port, server, user
 
@@ -104,7 +105,29 @@ def session(engine: Engine, tables):
 
 
 @pytest_asyncio.fixture()
-async def client() -> AsyncGenerator:
+async def app(session, settings, embeddings) -> FastAPI:
+    from app.main import app
+
+    def get_session_override():
+        return session
+
+    def get_settings_override():
+        return settings
+
+    def get_embeddings_override():
+        return embeddings
+
+    app.dependency_overrides[get_session] = get_session_override
+    app.dependency_overrides[get_settings] = get_settings_override
+    app.dependency_overrides[get_embeddings] = get_embeddings_override
+
+    yield app
+
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture()
+async def client(app) -> AsyncGenerator:
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
 

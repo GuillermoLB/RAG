@@ -7,7 +7,7 @@ from langchain_core.embeddings import Embeddings
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
-from app.dependencies import get_db, get_settings
+from app.dependencies import get_session, get_settings
 from app.domain.models import Document
 from app.ocr.file_handler import save_tmp_copy
 from app.repos.sql import document_repo
@@ -70,5 +70,5 @@ def split_document_and_index_chunks(
 
 if __name__ == "__main__":
     # Create a new database session
-    db = next(get_db())
+    db = next(get_session())
     extract_document(db)
