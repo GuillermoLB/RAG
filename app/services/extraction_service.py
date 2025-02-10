@@ -48,7 +48,7 @@ def convert_document(input_path: Path):
     return result
 
 
-def extract_text(data_file_path: str):
+def extract_text(data_file_path: str) -> LCDocument:
 
     logger.info(f"Data file path: {data_file_path}")
 

@@ -13,3 +13,13 @@ def create_document(session: Session, document: Document) -> Document:
     session.commit()
     session.refresh(document)
     return document
+
+
+def read_document(
+    session: Session,
+    document_id: int,
+) -> Document:
+    document = session.get(Document, document_id)
+    if not document:
+        return None
+    return document

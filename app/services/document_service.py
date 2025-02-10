@@ -51,20 +51,19 @@ def upload_document(
     return db_document
 
 
-def extract_document(settings: Settings, embeddings: Embeddings):
-    document = extract_text(data_file_path)
-    chunk_store = retriever_service.get_vector_store(
-        settings=settings,
-        collection_name="document_chunks",
-        embeddings=embeddings),
-    split_document_and_index_chunks(document, embeddings)
+def extract_document(session: Session, settings: Settings, embeddings: Embeddings, document_id: int):
+    document = document_repo.read_document(
+        session, document_id)
+    extracted_text = extract_text(data_file_path)
+    split_document_and_index_chunks(document, embeddings, extracted_text)
 
 
 def split_document_and_index_chunks(
-    document: LCDocument,
-    embeddings: HuggingFaceEmbeddings
+    document: Document,
+    embeddings: HuggingFaceEmbeddings,
+    extracted_text: str,
 ):
-    chunks = retriever_service.split_text_into_chunks(document)
+    chunks = retriever_service.split_text_into_chunks(extracted_text)
     retriever_service.index_chunks(chunks, settings, embeddings)
 
 

@@ -11,9 +11,10 @@ router = APIRouter()
 
 
 @router.post("/upload")
-async def upload_document_endpoint(
+def upload_document_endpoint(
         session: SessionDep,
         settings: SettingsDep,
+        current_user: UserDep,
         file: UploadFile):
 
     try:
@@ -34,18 +35,24 @@ async def upload_document_endpoint(
     return {"message": "Upload a document"}
 
 
-@router.post("/ingest")
-async def ingest_document_endpoint(
+@router.post("/{document_id}/extracted")
+def extract_document(
+        session: SessionDep,
         settings: SettingsDep,
-        db: SessionDep,
-        current_user: UserDep,
-        embeddings: EmbeddingsDep):
+        embeddings: EmbeddingsDep,
+        document_id: int):
     try:
-        # Await the ingest_document function
-        extract_document(settings=settings, embeddings=embeddings)
-        return {"message": "Document ingested successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        extracted_document = document_service.extract_document(
+            session=session,
+            settings=settings,
+            embeddings=embeddings,
+            document_id=document_id,
+        )
+        return extracted_document
+    except (HTTPException) as e:
+        raise HTTPException(status_code=e.code, detail=str(e))
+
+    return {"message": "Extracted document"}
 
 
 @router.post("/ask")
