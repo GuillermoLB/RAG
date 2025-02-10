@@ -7,6 +7,7 @@ from loguru import logger
 
 from app.core.config import Settings
 from app.dependencies import get_embeddings, get_settings
+from app.domain.models import Document
 from app.repos.vector.pgvector_repo import VectorIndex
 
 
@@ -35,11 +36,16 @@ def split_text_into_chunks(document: LCDocument) -> list[LCDocument]:
 
 def index_chunks(
         chunks: list[LCDocument],
-        settings: Settings,
+        document: Document,
         embeddings: Embeddings):
+    document_metadata = {
+        "name": document.name,
+        "document_uuid": str(document.uuid),
+    }
+    [chunk.metadata.update(document_metadata) for chunk in chunks]
     chunks_index = VectorIndex(
         documents=chunks,
         embeddings=embeddings,
     )
     result = chunks_index.index()
-    logger.info(f"Indexed {len(chunks)} chunks")
+    logger.debug(f"Chunks indexed: {result}")
