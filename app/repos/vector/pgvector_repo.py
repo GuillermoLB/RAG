@@ -31,3 +31,11 @@ class VectorIndex:
             vector_store=self.vector_store,
             record_manager=self.record_manager
         )
+
+
+def delete_vector_of_document(document_id: int):
+    namespace = f"pgvector/document_chunks"
+    record_manager = SQLRecordManager(
+        namespace, db_url=get_settings().get_connection_str()
+    )
+    record_manager.delete_record(document_id)

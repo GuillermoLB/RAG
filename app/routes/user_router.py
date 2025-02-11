@@ -29,6 +29,6 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post("/register", response_model=schemas.User)
+@router.post("/users", response_model=schemas.User)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_session)):
     return create_user(db, user)

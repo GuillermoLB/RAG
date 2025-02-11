@@ -32,7 +32,7 @@ def upload_document_endpoint(
     except (HTTPException) as e:
         raise HTTPException(status_code=e.code, detail=str(e))
 
-    return {"message": "Upload a document"}
+    return document
 
 
 @router.post("/{document_id}/extracted")

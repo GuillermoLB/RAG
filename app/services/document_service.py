@@ -54,8 +54,10 @@ def upload_document(
 def extract_document(session: Session, settings: Settings, embeddings: Embeddings, document_id: int):
     document = document_repo.read_document(
         session, document_id)
-    extracted_text = extract_text(data_file_path)
-    split_document_and_index_chunks(document, embeddings, extracted_text)
+    extracted_text = extract_text(
+        settings.DATA_FILE_PATH + "/" + document.name)
+    split_document_and_index_chunks(
+        document=document, embeddings=embeddings, extracted_text=extracted_text)
 
 
 def split_document_and_index_chunks(
@@ -64,7 +66,8 @@ def split_document_and_index_chunks(
     extracted_text: str,
 ):
     chunks = retriever_service.split_text_into_chunks(extracted_text)
-    retriever_service.index_chunks(chunks, settings, embeddings)
+    retriever_service.index_chunks(
+        settings=settings, chunks=chunks, document=document, embeddings=embeddings)
 
 
 if __name__ == "__main__":

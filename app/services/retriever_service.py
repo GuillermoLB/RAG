@@ -35,6 +35,7 @@ def split_text_into_chunks(document: LCDocument) -> list[LCDocument]:
 
 
 def index_chunks(
+        settings: Settings,
         chunks: list[LCDocument],
         document: Document,
         embeddings: Embeddings):
