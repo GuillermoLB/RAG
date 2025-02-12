@@ -10,10 +10,13 @@ from app.services.authentication_service import (authenticate_user,
                                                  create_access_token)
 
 settings = Settings()
-router = APIRouter()
+users = APIRouter(
+    prefix="/users",
+    tags=["users"],
+)
 
 
-@router.post("/token", response_model=schemas.Token)
+@users.post("/token", response_model=schemas.Token)
 async def login_for_access_token(
         db: Session = Depends(get_session),
         form_data: OAuth2PasswordRequestForm = Depends()):
@@ -29,6 +32,6 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post("/users", response_model=schemas.User)
+@users.post("/", response_model=schemas.User)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_session)):
     return create_user(db, user)
