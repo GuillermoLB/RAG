@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, UploadFile
 
+from app.error.exceptions import RAGException
 from app.services import document_service
 
 from ..dependencies import EmbeddingsDep, SessionDep, SettingsDep, UserDep
@@ -30,8 +31,8 @@ def upload_document(
             document=document,
         )
         return document
-    except (HTTPException) as e:
-        raise HTTPException(status_code=e.code, detail=str(e))
+    except (RAGException, HTTPException) as e:
+        raise HTTPException(status_code=e.code, detail=e.error)
 
 
 @documents.post("/{document_id}/extracted")
@@ -48,5 +49,5 @@ def extract_document(
             document_id=document_id,
         )
         return extracted_document
-    except (HTTPException) as e:
-        raise HTTPException(status_code=e.code, detail=str(e))
+    except (RAGException, HTTPException) as e:
+        raise HTTPException(status_code=e.code, detail=e.error)

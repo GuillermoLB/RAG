@@ -1,6 +1,7 @@
 import logging
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.dependencies import SessionDep
+from app.error.exceptions import RAGException
 from app.repos.sql import user_repo
 from app.domain.schemas import UserRead, UserCreate
 
@@ -21,6 +22,9 @@ logger = logging.getLogger(__name__)
                 201: {"description": "User created successfully"}
             })
 async def create_user(session: SessionDep, user: UserCreate):
-    logger.debug(f"Creating user: {user.username}")
-    user = user_repo.create_user(session, user)
-    return user
+    try:
+        logger.debug(f"Creating user: {user.username}")
+        user = user_repo.create_user(session, user)
+        return user
+    except (RAGException, HTTPException) as e:
+        raise HTTPException(status_code=e.code, detail=e.error)

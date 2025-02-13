@@ -13,3 +13,5 @@ class Warnings(metaclass=ErrorsWithCodes):
 
 class Errors(metaclass=ErrorsWithCodes):
     E001 = "User not found"
+    E002 = "User already exists"
+    E003 = "Incorrect username or password"

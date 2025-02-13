@@ -57,6 +57,6 @@ async def login_for_access_token(
             session, form_data.username, form_data.password)
         access_token = create_access_token(
             data={"sub": user.username}, settings=settings)
-    except RAGException as e:
+        return {"access_token": access_token, "token_type": "bearer"}
+    except (RAGException, HTTPException) as e:
         raise HTTPException(status_code=e.code, detail=e.error)
-    return {"access_token": access_token, "token_type": "bearer"}
