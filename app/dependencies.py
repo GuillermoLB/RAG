@@ -11,11 +11,11 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.domain.models import User as UserModel
 from app.domain.schemas import User
-from app.services.authentication_service import verify_token
+from app.services.token_service import verify_token
 
 from .core.config import Settings, build_llm
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="tokens")
 
 
 @lru_cache
@@ -54,7 +54,7 @@ def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    token_data = verify_token(token, get_settings(), credentials_exception)
+    token_data = verify_token(token, get_settings())
     user = db.query(UserModel).filter(
         UserModel.username == token_data.username).first()
     if user is None:

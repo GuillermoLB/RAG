@@ -11,6 +11,14 @@ class RAGException(Exception):
 
 
 class UserException(RAGException):
+
     """
-    All User related exceptions with specific error codes
+    All User' related exceptions with specific error codes
+    """
+
+
+class AuthenticationException(RAGException):
+
+    """
+    All User' related exceptions with specific error codes
     """

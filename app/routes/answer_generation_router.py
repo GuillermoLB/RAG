@@ -11,7 +11,7 @@ answer_generations = APIRouter(
 )
 
 
-@answer_generations.post("/")
+@answer_generations.post("")
 async def create_answer_generation(
         settings: SettingsDep,
         query: str,
@@ -21,6 +21,6 @@ async def create_answer_generation(
     try:
         response = generate_response(
             settings=settings, query=query, llm=llm, embeddings=embeddings)
-        return {response}
+        return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

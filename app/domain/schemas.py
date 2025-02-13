@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 from sqlalchemy import Enum
 
 
@@ -10,7 +10,11 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str
+    password: SecretStr
+
+
+class UserRead(UserBase):
+    pass
 
 
 class UserInDBBase(UserBase):
@@ -18,15 +22,11 @@ class UserInDBBase(UserBase):
     disabled: Optional[bool] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class User(UserInDBBase):
     pass
-
-
-class UserInDB(UserInDBBase):
-    hashed_password: str
 
 
 class Token(BaseModel):
