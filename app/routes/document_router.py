@@ -44,7 +44,7 @@ def extract_document(
     try:
         extracted_document = document_service.extract_document(
             session=session,
-            settings=settings,
+            data_file_path=settings.DATA_FILE_PATH,
             embeddings=embeddings,
             document_id=document_id,
         )

@@ -33,6 +33,7 @@ def validate_document(
         name=file_name,
         uuid=uuid4(),
     )
+    # TODO: Validate if isn't in the database
 
     return document
 
@@ -51,13 +52,15 @@ def upload_document(
     return db_document
 
 
-def extract_document(session: Session, settings: Settings, embeddings: Embeddings, document_id: int):
+def extract_document(session: Session, data_file_path: str, embeddings: Embeddings, document_id: int) -> Document:
     document = document_repo.read_document(
         session, document_id)
     extracted_text = extract_text(
-        settings.DATA_FILE_PATH + "/" + document.name)
+        data_file_path + "/" + document.name)
     split_document_and_index_chunks(
         document=document, embeddings=embeddings, extracted_text=extracted_text)
+    # TODO: Add a flag for extracted
+    return document
 
 
 def split_document_and_index_chunks(

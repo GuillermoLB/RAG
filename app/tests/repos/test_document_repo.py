@@ -1,3 +1,4 @@
+import uuid
 import pytest
 from loguru import logger
 from sqlalchemy.orm import Session
@@ -7,8 +8,7 @@ from app.tests.conftest import DocumentFactory, session
 
 
 def test_create_document(session):
-
-    document = DocumentFactory(name="test_document")
+    document = Document(name="test_document", uuid=uuid.uuid4())
     created_document = document_repo.create_document(
         session=session, document=document)
 
