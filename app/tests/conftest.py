@@ -21,6 +21,7 @@ from app.dependencies import get_current_active_user, get_embeddings, get_llm, g
 from app.domain.schemas import default_uuid
 
 from app.database import database, password, port, server, user
+from app.repos.filesystem.local_repo import LocalFileSystemRepository
 
 
 @pytest.fixture(scope="session")
@@ -28,12 +29,6 @@ def settings() -> Settings:
     settings = get_settings()
     settings.POSTGRES_DB = "postgres_tests"
     return settings
-
-
-@pytest.fixture(scope="session")
-def llm(settings):
-    llm = get_llm()
-    return llm
 
 
 @pytest.fixture(scope="session")
@@ -122,7 +117,7 @@ def user_1():
 
 
 @pytest_asyncio.fixture()
-async def app(session, settings, embeddings, llm) -> FastAPI:
+async def app(session, settings, embeddings) -> FastAPI:
     from app.main import app
 
     def get_session_override():
@@ -131,16 +126,8 @@ async def app(session, settings, embeddings, llm) -> FastAPI:
     def get_settings_override():
         return settings
 
-    def get_embeddings_override():
-        return embeddings
-
-    def get_llm_override():
-        return llm
-
     app.dependency_overrides[get_session] = get_session_override
     app.dependency_overrides[get_settings] = get_settings_override
-    app.dependency_overrides[get_embeddings] = get_embeddings_override
-    app.dependency_overrides[get_llm] = get_llm_override
 
     yield app
 
@@ -157,6 +144,11 @@ async def client(app) -> AsyncGenerator:
 
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
+
+
+@pytest.fixture
+def local_repo():
+    return LocalFileSystemRepository()
 
 
 class UserFactory(SQLAlchemyModelFactory):

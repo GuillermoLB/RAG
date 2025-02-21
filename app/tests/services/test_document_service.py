@@ -1,11 +1,13 @@
-import pathlib
+import io
+from pathlib import Path
+from fastapi import UploadFile
 import pytest
 from langchain_core.language_models import BaseLanguageModel
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.domain.models import Document
-from app.services.document_service import extract_document, validate_document
+from app.services.document_service import extract_document, upload_document, validate_document
 from app.tests.conftest import DocumentFactory, session
 
 
