@@ -18,7 +18,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from langchain.vectorstores.pgvector import PGVector
 from app.core.config import Settings
 from app.dependencies import get_current_active_user, get_embeddings, get_llm, get_settings, get_session
-from app.domain.schemas import default_uuid
+from app.domain.schemas import DocumentStatus, default_uuid
 
 from app.database import database, password, port, server, user
 from app.repos.filesystem.local_repo import LocalFileSystemRepository
@@ -169,3 +169,4 @@ class DocumentFactory(SQLAlchemyModelFactory):
 
     uuid = Sequence(lambda n: str(uuid.uuid4()))
     name = Sequence(lambda n: f"doc1.pdf")
+    status = DocumentStatus.UPLOADED

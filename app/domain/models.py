@@ -19,6 +19,7 @@ class Document(Base):
     name: Mapped[str] = mapped_column(String, index=True)
     chunks: Mapped[Optional[int]] = mapped_column(Integer)
     uuid: Mapped[UUID] = mapped_column(index=True)
+    status: Mapped[str]
 
 
 class User(Base):

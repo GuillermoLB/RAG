@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.domain.models import Document
+from app.domain.schemas import DocumentStatus
 from app.services.document_service import extract_document, upload_document, validate_document
 from app.tests.conftest import DocumentFactory, session
 
@@ -25,12 +26,11 @@ def test_extract_document(
         session: Session,
 ):
     document = DocumentFactory()
-    # document = extract_document(
-    #     session=session,
-    #     data_file_path=settings.DATA_FILE_PATH,
-    #     embeddings=embeddings,
-    #     document_id=document.id,
-    # )
+    document = extract_document(
+        session=session,
+        data_file_path=settings.DATA_FILE_PATH,
+        embeddings=embeddings,
+        document_id=document.id,
+    )
 
-    # TODO: Add extracted flag assertion when implemented
-    assert True
+    assert document.status == DocumentStatus.EXTRACTED

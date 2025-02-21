@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.dependencies import get_settings
 from app.domain.models import Document
+from app.domain.schemas import DocumentStatus, DocumentUpdate
 from app.ocr.file_handler import save_tmp_copy
 from app.repos.sql import document_repo
 from app.services import retriever_service
@@ -26,6 +27,7 @@ def validate_document(
     document = Document(
         name=file_name,
         uuid=uuid4(),
+        status=DocumentStatus.UPLOADED
     )
     # TODO: Validate if isn't in the database
 
@@ -55,7 +57,15 @@ def extract_document(session: Session, data_file_path: str, embeddings: Embeddin
     split_document_and_index_chunks(
         document=document, embeddings=embeddings, extracted_text=extracted_text)
     # TODO: Add a flag for extracted
-    return document
+
+    updated_doc = document_repo.update_document(
+        session=session,
+        document=document,
+        document_update=DocumentUpdate(
+            status=DocumentStatus.EXTRACTED,
+        ),
+    )
+    return updated_doc
 
 
 def split_document_and_index_chunks(

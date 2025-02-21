@@ -2,9 +2,14 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from pydantic import BaseModel, SecretStr
-from sqlalchemy import Enum
+from enum import Enum
 
 default_uuid = "00000000-0000-0000-0000-000000000001"
+
+
+class DocumentStatus(str, Enum):
+    UPLOADED = "UPLOADED"
+    EXTRACTED = "EXTRACTED"
 
 
 class UserBase(BaseModel):
@@ -72,6 +77,14 @@ class Document(DocumentBase):
 
     class Config:
         orm_mode = True
+
+
+class DocumentUpdate(BaseModel):
+    status: DocumentStatus | None
+
+    model_config = {
+        "arbitrary_types_allowed": True
+    }
 
 
 class LLMType(str, Enum):
