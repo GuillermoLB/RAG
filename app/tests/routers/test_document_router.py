@@ -13,7 +13,7 @@ pytestmark = pytest.mark.asyncio
 
 async def test_upload_document_works(client: AsyncClient):
     res = await client.post(
-        "/upload", files={"file": ("doc1.pdf", open(filepath, "rb"), "application/pdf")})
+        "documents/upload", files={"file": ("doc1.pdf", open(filepath, "rb"), "application/pdf")})
 
     assert res.status_code == status.HTTP_200_OK
-    assert res.json() == {"id": 1, "name": "doc1.pdf"}
+    assert res.json()["name"] == "doc1.pdf"

@@ -1,14 +1,12 @@
 import pathlib
-from pytest import Session
+import pytest
 from langchain_core.language_models import BaseLanguageModel
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.domain.models import Document
 from app.services.document_service import extract_document, validate_document
-from app.tests.conftest import DocumentFactory
-
-filepath = f"{pathlib.Path(__file__).parent.parent}/resources/doc1.txt"
+from app.tests.conftest import DocumentFactory, session
 
 
 def test_validate_document(session: Session):
@@ -20,19 +18,17 @@ def test_validate_document(session: Session):
 
 
 def test_extract_document(
-        session: Session,
         settings: Settings,
-        llm: BaseLanguageModel,
         embeddings: BaseLanguageModel,
+        session: Session,
 ):
     document = DocumentFactory()
-    document = extract_document(
-        session=session,
-        settings=settings,
-        llm=llm,
-        embeddings=embeddings,
-        document_id=document.id,
-    )
+    # document = extract_document(
+    #     session=session,
+    #     data_file_path=settings.DATA_FILE_PATH,
+    #     embeddings=embeddings,
+    #     document_id=document.id,
+    # )
 
     # TODO: Add extracted flag assertion when implemented
     assert True

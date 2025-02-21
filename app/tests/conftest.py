@@ -17,7 +17,8 @@ from pgvector.psycopg2 import register_vector
 from sqlalchemy.orm import scoped_session, sessionmaker
 from langchain.vectorstores.pgvector import PGVector
 from app.core.config import Settings
-from app.dependencies import get_embeddings, get_settings, get_session
+from app.dependencies import get_current_active_user, get_embeddings, get_llm, get_settings, get_session
+from app.domain.schemas import default_uuid
 
 from app.database import database, password, port, server, user
 
@@ -27,6 +28,12 @@ def settings() -> Settings:
     settings = get_settings()
     settings.POSTGRES_DB = "postgres_tests"
     return settings
+
+
+@pytest.fixture(scope="session")
+def llm(settings):
+    llm = get_llm()
+    return llm
 
 
 @pytest.fixture(scope="session")
@@ -104,8 +111,18 @@ def session(engine: Engine, tables):
     scopedsession.remove()
 
 
+@pytest.fixture
+def user_1():
+    user = UserFactory(
+        uuid=default_uuid,
+        username="user_1",
+        disabled=False,
+    )
+    yield user
+
+
 @pytest_asyncio.fixture()
-async def app(session, settings, embeddings) -> FastAPI:
+async def app(session, settings, embeddings, llm) -> FastAPI:
     from app.main import app
 
     def get_session_override():
@@ -117,9 +134,13 @@ async def app(session, settings, embeddings) -> FastAPI:
     def get_embeddings_override():
         return embeddings
 
+    def get_llm_override():
+        return llm
+
     app.dependency_overrides[get_session] = get_session_override
     app.dependency_overrides[get_settings] = get_settings_override
     app.dependency_overrides[get_embeddings] = get_embeddings_override
+    app.dependency_overrides[get_llm] = get_llm_override
 
     yield app
 
@@ -128,6 +149,12 @@ async def app(session, settings, embeddings) -> FastAPI:
 
 @pytest_asyncio.fixture()
 async def client(app) -> AsyncGenerator:
+
+    def get_user_override():
+        return user_1
+
+    app.dependency_overrides[get_current_active_user] = get_user_override
+
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
 
@@ -149,4 +176,4 @@ class DocumentFactory(SQLAlchemyModelFactory):
         sqlalchemy_session_persistence = "flush"
 
     uuid = Sequence(lambda n: str(uuid.uuid4()))
-    name = Sequence(lambda n: f"document{n+1}.pdf")
+    name = Sequence(lambda n: f"doc1.pdf")

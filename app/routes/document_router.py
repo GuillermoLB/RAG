@@ -28,6 +28,7 @@ def upload_document(
         document = document_service.upload_document(
             file=file,
             session=session,
+            data_file_path=settings.DATA_FILE_PATH,
             document=document,
         )
         return document
