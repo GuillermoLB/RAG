@@ -10,6 +10,7 @@ default_uuid = "00000000-0000-0000-0000-000000000001"
 class DocumentStatus(str, Enum):
     UPLOADED = "UPLOADED"
     EXTRACTED = "EXTRACTED"
+    SKIPPED = "SKIPPED"
 
 
 class UserBase(BaseModel):

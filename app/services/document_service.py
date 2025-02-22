@@ -29,7 +29,13 @@ def validate_document(
         uuid=uuid4(),
         status=DocumentStatus.UPLOADED
     )
-    # TODO: Validate if isn't in the database
+    found_doc = document_repo.read_document_by_name(
+        session, file_name
+    )
+    if found_doc:
+        logger.warning(
+            f"Document with name: {file_name} already exist in this project")
+        document.status = DocumentStatus.SKIPPED
 
     return document
 
@@ -56,7 +62,6 @@ def extract_document(session: Session, data_file_path: str, embeddings: Embeddin
         data_file_path + "/" + document.name)
     split_document_and_index_chunks(
         document=document, embeddings=embeddings, extracted_text=extracted_text)
-    # TODO: Add a flag for extracted
 
     updated_doc = document_repo.update_document(
         session=session,

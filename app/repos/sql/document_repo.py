@@ -26,6 +26,16 @@ def read_document(
     return document
 
 
+def read_document_by_name(
+    session: Session,
+    name: str,
+) -> Document:
+    document = session.query(Document).filter_by(name=name).first()
+    if not document:
+        return None
+    return document
+
+
 def update_document(session: Session, document: Document, document_update: DocumentUpdate) -> Document:
     logger.info(f"Updating document {document.name}")
     document_data = document_update.dict(exclude_unset=True)
