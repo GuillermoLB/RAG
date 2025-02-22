@@ -50,7 +50,7 @@ init_db:
 ## Create the database tables
 .PHONY: create_tables
 create_tables:
-	docker compose exec api alembic upgrade head
+	docker compose exec app alembic -c app/alembic.ini upgrade head
 
 ## Run the FastAPI application locally
 .PHONY: run

@@ -73,7 +73,7 @@ def engine(settings: Settings) -> Engine:
 @pytest.fixture(scope="session")
 def tables(engine, settings: Settings, embeddings):
     alembic_cfg = Config(
-        pathlib.Path(__file__).parent.parent.parent.joinpath("alembic.ini")
+        pathlib.Path(__file__).parent.parent.joinpath("alembic.ini")
     )
     # alembic_cfg.set_main_option("sqlalchemy.url", str(engine.url))
     command.upgrade(alembic_cfg, "head")
