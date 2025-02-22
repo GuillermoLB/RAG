@@ -6,8 +6,8 @@ from pydantic_settings import BaseSettings
 
 from app.domain.schemas import LLModel, LLMType
 
-# Load environment variables from .env file
-load_dotenv(override=True)
+# Load environment variables
+load_dotenv()
 
 
 class Settings(BaseSettings):

@@ -1,4 +1,0 @@
-# Application-specific settings
-APP_NAME = "RAG"
-DEBUG = True
-LOGGING_LEVEL = "INFO"

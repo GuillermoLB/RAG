@@ -42,15 +42,45 @@ create_environment:
 	python3 -m venv .venv
 	@echo ">>> New virtualenv created. Activate with:\nsource .venv/bin/activate"
 
-## Initialize the database using Alembic
+## Initialize the database
 .PHONY: init_db
 init_db:
 	docker-compose up db -d  # Start the Docker services
+
+## Create the database tables
+.PHONY: create_tables
+create_tables:
+	docker compose exec api alembic upgrade head
 
 ## Run the FastAPI application locally
 .PHONY: run
 run:
 	. .venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+## Run in Docker
+.PHONY: up
+up:
+	docker-compose up
+
+## Stop the Docker services
+.PHONY: down
+down:
+	docker-compose down
+
+## Run tests
+.PHONY: test
+test:
+	pytest tests
+
+## Run tests with coverage
+.PHONY: coverage
+coverage:
+	pytest --cov=app tests
+
+## Run tests inside Docker container
+.PHONY: test_docker
+test_docker:
+	docker-compose exec app pytest app/tests
 
 #################################################################################
 # PROJECT RULES                                                                 #

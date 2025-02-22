@@ -5,6 +5,7 @@ from factory.alchemy import SQLAlchemyModelFactory
 from factory import Sequence
 from fastapi import FastAPI
 from httpx import AsyncClient
+import httpx
 import psycopg2
 import pytest_asyncio
 from sqlalchemy import UUID, Engine, create_engine
@@ -141,8 +142,8 @@ async def client(app) -> AsyncGenerator:
         return user_1
 
     app.dependency_overrides[get_current_active_user] = get_user_override
-
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = httpx.ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
 
 

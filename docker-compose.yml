@@ -3,32 +3,23 @@ version: '3.8'
 services:
   db:
     image: ankane/pgvector:latest
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: db
+    env_file:
+    - .env.docker
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data  # Use a named volume for data persistence
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Initialize the database with pgvector extension
 
   app:
     build: .
     ports:
       - "8000:8000"
+    env_file:
+    - .env.docker
+    environment:
+      - PYTHONPATH=/app
     depends_on:
       - db
-    environment:
-      DATA_FILES_PATH: data
-      EMBED_MODEL_ID: EleutherAI/gpt-neo-125M
-      MAX_TOKENS: 512
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: db
-      POSTGRES_HOST: localhost
-      POSTGRES_PORT: 5432
-      PYTHONPATH: /app
     volumes:
       - .:/app
       - /data:/data
