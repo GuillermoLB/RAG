@@ -13,16 +13,13 @@ load_dotenv()
 class Settings(BaseSettings):
     POSTGRES_USER: str = "user"
     POSTGRES_PASSWORD: str = "password"
-    POSTGRES_HOST: str = "localhost"
+    POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "db"
     EMBED_MODEL_ID: str = "sentence-transformers/all-MiniLM-L6-v2"
+    QA_MODEL_ID: str = "mistral"
+    QA_MODEL_URL: str
     MAX_TOKENS: int = 512
-    CHAT_LLM: LLModel = LLModel(
-        config={"model": "mistral", "temperature": 0.0},
-        type=LLMType.CHAT_LLM,
-        fake=False,
-    )
     DATA_FILE_PATH: str = "data"
     LANGSMITH_API_KEY: str
     LANGSMITH_TRACING: bool = True
@@ -31,6 +28,19 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     VECTOR_DIMENSION: int = 768
+
+    @property
+    def QA_LLM(self):
+        from app.domain.schemas import LLModel, LLMType
+        return LLModel(
+            config={
+                "model": self.QA_MODEL_ID,
+                "temperature": 0.0,
+                "base_url": self.QA_MODEL_URL
+            },
+            type=LLMType.QA,
+            fake=False,
+        )
 
     def get_connection_str(self):
         """
@@ -41,7 +51,7 @@ class Settings(BaseSettings):
 
 def build_llm(llm: LLModel) -> BaseModel:
 
-    if llm.type == LLMType.CHAT_LLM:
+    if llm.type == LLMType.QA:
         return ChatOllama(**llm.config)
     elif llm.type == LLMType.EMBEDDINGS:
         return HuggingFaceEmbeddings(**llm.config)

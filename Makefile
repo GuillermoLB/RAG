@@ -6,6 +6,12 @@ PROJECT_NAME = embedding-module
 PYTHON_VERSION = 3.12
 PYTHON_INTERPRETER = python
 
+# Load environment variables from .env
+ifneq (,$(wildcard .env))
+    include .env
+    export $(shell sed 's/=.*//' .env)
+endif
+
 # Set the PYTHONPATH environment variable
 export PYTHONPATH := $(shell pwd)
 
@@ -51,6 +57,12 @@ init_db:
 .PHONY: create_tables
 create_tables:
 	docker compose exec app alembic -c app/alembic.ini upgrade head
+
+## Pull model
+.PHONY: pull_model
+pull_model:
+	docker compose exec ollama ollama pull $(QA_MODEL_ID)
+
 
 ## Run the FastAPI application locally
 .PHONY: run

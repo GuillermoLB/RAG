@@ -23,6 +23,25 @@ services:
     volumes:
       - .:/app
       - /data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+    mem_limit: 6G
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 7869:11434
+    env_file:
+      - .env.docker
+    volumes:
+      - .:/code
+      - ./ollama/ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: always
 
 volumes:
   pgdata:

@@ -39,7 +39,7 @@ def get_session():
 
 
 def get_llm():
-    return build_llm(llm=get_settings().CHAT_LLM)
+    return build_llm(llm=get_settings().QA_LLM)
 
 
 def get_embeddings():

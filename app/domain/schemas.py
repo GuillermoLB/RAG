@@ -89,7 +89,7 @@ class DocumentUpdate(BaseModel):
 
 
 class LLMType(str, Enum):
-    CHAT_LLM = "CHAT"
+    QA = "QA"
     EMBEDDINGS = "EMBEDDINGS"
 
 
